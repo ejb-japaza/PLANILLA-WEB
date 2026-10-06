@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Ejb.Planilla.Api/Ejb.Planilla.Api.csproj" />
+  <Project Path="Ejb.Planilla.Pruebas/Ejb.Planilla.Pruebas.csproj" />
+</Solution>
