@@ -98,6 +98,8 @@ Si algún día de verdad hace falta heredar, se quita el `sealed` en ese caso co
 | `;` vs `{ }` al declarar | Un `record` de una línea termina en `;`. Una clase con contenido lleva `{ }`, y todo campo o método va **dentro** de ellas |
 | `T?` | Puede estar vacío (`null`) |
 | `=>` en un método | Forma corta de un método que solo devuelve una expresión |
+| `this` en el primer parámetro (método de extensión) | Permite llamar el método como si fuera del objeto: `WsCodCom(this ClaimsPrincipal usuario)` se usa como `User.WsCodCom()` (ver `VarGlobales.cs`) |
+| `!.Value` vs `?.Value` | `!` = "sé que no es null" (si lo es, falla con error 500); `?` = "si es null, devuelve null". Usar `!` solo cuando el dato siempre existe |
 | `IOptions<T>` en un constructor | .NET entrega la sección de configuración correspondiente (inyección de dependencias) |
 
 ### Nombres de variables y parámetros
@@ -187,7 +189,7 @@ No hacen falta paquetes NuGet nuevos: `PasswordHasher` viene con ASP.NET Core y 
 | ✅ **B3** | **CrearContrasenaWeb** (primer ingreso) | `POST /api/acceso/contrasena` |
 | B4 | RenovarSesion | `POST /api/acceso/renovar` |
 | B5 | CerrarSesion | `POST /api/acceso/logout` |
-| B6 | ElegirContexto: **fase 2 del login** (compañía, sucursal, tipo de planilla, periodo). Ver `ARQUITECTURA_BACKEND.md` §8.1 | `GET /api/acceso/contexto/opciones`, `POST /api/acceso/contexto` |
+| ✅ B6 | ElegirContexto: **fase 2 del login** (compañía, sucursal, tipo de planilla, periodo). Ver `ARQUITECTURA_BACKEND.md` §8.1 | `GET /api/acceso/contexto/opciones`, `POST /api/acceso/contexto` |
 | B7 | ObtenerMenu (permisos de `GENUSU2`) | `GET /api/acceso/menu` |
 
 ## Paso 0 – Requisitos

@@ -34,7 +34,7 @@ public sealed class CrearContrasenaWebController : ControllerBase
             return ValidationProblem(new ValidationProblemDetails(validacion.ToDictionary()));
 
         // El usuario sale del token ya validado, nunca del cuerpo
-        var wsCodUsu = User.FindFirst(ClaimsPlanilla.Usuario)!.Value;
+        var wsCodUsu = User.WsCodUsu();
 
         var resultado = await _servicio.Ejecutar(wsCodUsu, solicitud, ct);
         if (!resultado.Exito)

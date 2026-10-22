@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Ejb.Planilla.Api.Compartido.Seguridad;
 
-/// <summary>Configura JWT (acceso y cambio de contraseña), la política "todo exige sesión" y el límite de intentos del login.</summary>
+/// <summary>Configura JWT (acceso y cambio de contraseña), las políticas "todo exige sesión" y "ConContexto", y el límite de intentos del login.</summary>
 public static class ConfiguracionSeguridad
 {
     /// <summary>Nombre del límite de intentos: se aplica con [EnableRateLimiting(ConfiguracionSeguridad.LimiteLogin)].</summary>
@@ -17,6 +17,13 @@ public static class ConfiguracionSeguridad
     /// Se aplica con [Authorize(AuthenticationSchemes = ConfiguracionSeguridad.EsquemaContrasena)].
     /// </summary>
     public const string EsquemaContrasena = "Contrasena";
+
+    /// <summary>
+    /// Política para los módulos: exige token con contexto (compañía, sucursal, tipo de planilla y periodo).
+    /// Sin contexto responde 403. Equivale a EnsureWorkspaceIsSelected de WEB_EJBCONTABLE.
+    /// Se aplica con [Authorize(Policy = ConfiguracionSeguridad.ConContexto)].
+    /// </summary>
+    public const string ConContexto = "ConContexto";
 
     public static IServiceCollection AddSeguridad(this IServiceCollection services, IConfiguration configuracion)
     {
@@ -38,7 +45,7 @@ public static class ConfiguracionSeguridad
 
         void Configurar(JwtBearerOptions jwt, string audiencia)
         {
-            jwt.MapInboundClaims = false; // conservar los nombres cortos de ClaimsPlanilla
+            jwt.MapInboundClaims = false; // conservar los nombres cortos de VarGlobales
             jwt.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidIssuer = opciones.Emisor,
@@ -46,13 +53,20 @@ public static class ConfiguracionSeguridad
                 IssuerSigningKey = new SymmetricSecurityKey(clave),
                 ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
                 ClockSkew = TimeSpan.FromSeconds(30),
-                NameClaimType = ClaimsPlanilla.Usuario,
+                NameClaimType = VarGlobales.CodUsu,
             };
         }
 
         // Todo endpoint exige sesión salvo los marcados con [AllowAnonymous]
+        // ConContexto: además de sesión, el token debe traer el contexto elegido en la fase 2 del login
         services.AddAuthorizationBuilder()
-            .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build())
+            .AddPolicy(ConContexto, politica => politica
+                .RequireAuthenticatedUser()
+                .RequireClaim(VarGlobales.CodCom)
+                .RequireClaim(VarGlobales.CodSuc)
+                .RequireClaim(VarGlobales.TipTra)
+                .RequireClaim(VarGlobales.PerAct));
 
         // Límite de intentos del login: 5 por minuto por IP (responde 429)
         services.AddRateLimiter(limites =>

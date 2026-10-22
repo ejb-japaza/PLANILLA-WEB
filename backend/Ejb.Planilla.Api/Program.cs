@@ -4,6 +4,7 @@ using Ejb.Planilla.Api.Compartido.Salud;
 using Ejb.Planilla.Api.Compartido.Seguridad;
 using Ejb.Planilla.Api.Modulos.Acceso;
 using Ejb.Planilla.Api.Modulos.Acceso.CrearContrasenaWeb;
+using Ejb.Planilla.Api.Modulos.Acceso.ElegirContexto;
 using Ejb.Planilla.Api.Modulos.Acceso.IniciarSesion;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -36,6 +37,8 @@ builder.Services.AddSingleton<EmisorTokens>();
 builder.Services.AddScoped<IUsuarioRepo, UsuarioRepo>();
 builder.Services.AddScoped<IniciarSesionServicio>();
 builder.Services.AddScoped<CrearContrasenaWebServicio>();
+builder.Services.AddScoped<IContextoRepo, ContextoRepo>();
+builder.Services.AddScoped<ElegirContextoServicio>();
 
 var app = builder.Build();
 
